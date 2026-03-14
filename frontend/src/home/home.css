@@ -1,0 +1,19 @@
+.home {
+    display: flex;
+    flex-direction: row;
+}
+
+.navbar {
+    width: 15%;
+    position: fixed;
+    height: 100vh;
+}
+
+.pages {
+    width: 95%;
+    margin-left: 18%;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}

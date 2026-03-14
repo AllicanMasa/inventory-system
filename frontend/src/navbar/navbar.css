@@ -1,0 +1,45 @@
+.menu {
+    background-color: rgb(9, 0, 50);
+    padding: 1rem;
+    width: 100%;
+    height: 90vh;
+    margin: 1rem;
+    border-radius: .5rem;
+}
+
+.menu h2 {
+    font-size: 2rem;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    padding-left: 1rem;
+    color: #ffff;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+}
+
+.options a {
+    text-decoration: none;
+    font-size: 1rem;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: .5rem;
+    margin: 0rem;
+}
+
+.options .icon {
+    font-size: 2rem;
+    margin-right: .5rem;
+    padding-bottom: -1.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center; /* vertically align icon and text */
+  gap: 15px; /* space between icon and text */
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
