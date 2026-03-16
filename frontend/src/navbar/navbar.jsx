@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../navbar/navbar.css";
 import {
   MdSpaceDashboard,
@@ -9,13 +9,37 @@ import {
   MdOutlineAdminPanelSettings,
 } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
-import { FaUser } from "react-icons/fa"; // replaced invalid FaBuildingUser
+import { FaUser } from "react-icons/fa";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("access_token");
+
+    try {
+      if (token) {
+        await fetch("http://localhost:8000/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } finally {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("permissions");
+      navigate("/");
+    }
+  };
+
   return (
     <div>
       <section className="menu">
         <h2>RTW</h2>
+        {user && <p>{user.name} ({user.role})</p>}
         <section className="options">
           <Link to="/home/dashboard" className="nav-item">
             <MdSpaceDashboard className="icon" />
@@ -50,6 +74,11 @@ const Navbar = () => {
             <FaUser className="icon" />
             <span className="nav-text">Audit Logs</span>
           </Link>
+
+          <button type="button" className="nav-item" onClick={handleLogout}>
+            <FaUser className="icon" />
+            <span className="nav-text">Logout</span>
+          </button>
         </section>
       </section>
     </div>
