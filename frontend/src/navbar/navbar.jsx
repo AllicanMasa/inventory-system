@@ -11,17 +11,27 @@ import {
 import { AiOutlineProduct } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 
+// ✅ keep this (from your branch)
 const hasPermission = (permissions, requiredPrefixes) =>
   requiredPrefixes.some((prefix) =>
-    permissions.some((permission) => permission === prefix || permission.startsWith(`${prefix}:`)),
+    permissions.some(
+      (permission) =>
+        permission === prefix || permission.startsWith(`${prefix}:`)
+    )
   );
 
 const Navbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  // ✅ keep permissions logic
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
-  const canViewDashboard = hasPermission(permissions, ["products:manage", "users:manage", "settings:manage"]);
+  const canViewDashboard = hasPermission(permissions, [
+    "products:manage",
+    "users:manage",
+    "settings:manage",
+  ]);
   const canManageProducts = hasPermission(permissions, ["products:manage"]);
   const canManageCategories = hasPermission(permissions, ["categories:manage"]);
   const canManageSuppliers = hasPermission(permissions, ["suppliers:manage"]);
@@ -53,11 +63,14 @@ const Navbar = () => {
     <div>
       <section className="menu">
         <h2>RTW</h2>
+
+        {/* ✅ clean version */}
         {user && (
           <p>
             {user.name} ({user.role})
           </p>
         )}
+
         <section className="options">
           {canViewDashboard && (
             <Link to="/home/dashboard" className="nav-item">
@@ -102,12 +115,13 @@ const Navbar = () => {
           )}
 
           {canViewAuditLogs && (
-            <Link to="/home/users" className="nav-item">
+            <Link to="/home/audit-logs" className="nav-item">
               <FaUser className="icon" />
               <span className="nav-text">Audit Logs</span>
             </Link>
           )}
 
+          {/* ✅ FIXED logout section (no duplicate/broken code) */}
           <button type="button" className="nav-item" onClick={handleLogout}>
             <FaUser className="icon" />
             <span className="nav-text">Logout</span>
