@@ -14,3 +14,23 @@ class ProductResponse(ProductCreate):
 
     class Config:
         from_attributes = True
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class AuthUser(BaseModel):
+    id: int
+    name: str
+    email: str
+    role: str
+    department_id: int | None
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: AuthUser
+    permissions: list[str]
