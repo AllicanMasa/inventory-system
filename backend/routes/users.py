@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from backend import auth, models, schemas
+from backend.audit import log_action
 from backend.database import get_db
 from fastapi import Body
 
@@ -177,6 +178,7 @@ def create_user(payload: schemas.UserCreate, db: Session = Depends(get_db), cred
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    log_action(db, current_user_id, f"Created user {new_user.email} (id={new_user.id})")
     return new_user
 
 # PUT edit user
@@ -205,6 +207,7 @@ def update_user(user_id: int, payload: schemas.UserUpdate, db: Session = Depends
     
     db.commit()
     db.refresh(user)
+    log_action(db, current_user_id, f"Updated user {user.email} (id={user.id})")
     return user
 
 # DELETE user
@@ -223,8 +226,10 @@ def delete_user(user_id: int, db: Session = Depends(get_db), credentials: HTTPAu
     if current_user.role_id != 1 and user.role_id == 1:
         raise HTTPException(status_code=403, detail="Cannot delete super user")
     
+    deleted_email = user.email
     db.delete(user)
     db.commit()
+    log_action(db, current_user_id, f"Deleted user {deleted_email} (id={user_id})")
     return {"message": "User deleted successfully"}
 
 # Get all roles

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
@@ -101,3 +102,13 @@ class DepartmentOut(BaseModel):
     name: str
     class Config:
         orm_mode = True
+
+
+class AuditLogOut(BaseModel):
+    id: int
+    user_id: int
+    action: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
