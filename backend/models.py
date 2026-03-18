@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Numeric, TIMESTAMP
 from sqlalchemy.sql import func
-from database import Base
+from backend.database import Base
 
 
 class Department(Base):
@@ -33,8 +33,8 @@ class User(Base):
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
 
 
 class Product(Base):

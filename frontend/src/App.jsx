@@ -6,6 +6,9 @@ import Home from "./home/home";
 import Dashboard from "./dashboard/dashboard";
 import Product from "./product/product";
 import Users from "./users/users";
+import Categories from "./categories/categories";
+import Suppliers from "./suppliers/suppliers";
+import AuditLogs from "./auditlogs/auditlogs";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("access_token");
@@ -29,6 +32,9 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="product" element={<Product />} />
           <Route path="users" element={<Users />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="audit-logs" element={<AuditLogs />} />
         </Route>
       </Routes>
     </BrowserRouter>

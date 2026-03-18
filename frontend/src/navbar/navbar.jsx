@@ -16,8 +16,8 @@ const hasPermission = (permissions, requiredPrefixes) =>
   requiredPrefixes.some((prefix) =>
     permissions.some(
       (permission) =>
-        permission === prefix || permission.startsWith(`${prefix}:`)
-    )
+        permission === prefix || permission.startsWith(`${prefix}:`),
+    ),
   );
 
 const Navbar = () => {
@@ -25,18 +25,31 @@ const Navbar = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   // ✅ keep permissions logic
+
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
+  console.log("USER:", user);
+  console.log("PERMISSIONS:", permissions);
+
   const canViewDashboard = hasPermission(permissions, [
+    "products:view",
     "products:manage",
     "users:manage",
-    "settings:manage",
   ]);
-  const canManageProducts = hasPermission(permissions, ["products:manage"]);
+
+  const canManageProducts = hasPermission(permissions, [
+    "products:manage",
+    "products:view",
+  ]);
+
   const canManageCategories = hasPermission(permissions, ["categories:manage"]);
+
   const canManageSuppliers = hasPermission(permissions, ["suppliers:manage"]);
+
   const canUseInventory = hasPermission(permissions, ["stock:in", "stock:out"]);
+
   const canManageUsers = hasPermission(permissions, ["users:manage"]);
+
   const canViewAuditLogs = hasPermission(permissions, ["audit_logs:view"]);
 
   const handleLogout = async () => {
@@ -66,8 +79,8 @@ const Navbar = () => {
 
         {/* ✅ clean version */}
         {user && (
-          <p>
-            {user.name} ({user.role})
+          <p style={{color: "white"}}>
+            Welcome {user.name} ({user.role})
           </p>
         )}
 
@@ -87,7 +100,7 @@ const Navbar = () => {
           )}
 
           {canManageCategories && (
-            <Link to="/home/category" className="nav-item">
+            <Link to="/home/categories" className="nav-item">
               <MdOutlineCategory className="icon" />
               <span className="nav-text">Categories</span>
             </Link>

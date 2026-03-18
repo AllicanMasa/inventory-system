@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import models
+from backend import models
 
 
 def create_product(db: Session, product):
