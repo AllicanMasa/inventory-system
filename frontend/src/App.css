@@ -6,5 +6,15 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: rgb(202, 202, 202);
+  background-color: rgb(0, 0, 0);
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("../src/assets/fonts/Qindret-OGxxP.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gothic";
+  src: url("../src/assets/fonts/GothicBlastGrungeDemo-pggZZ.ttf") format("truetype");
 }

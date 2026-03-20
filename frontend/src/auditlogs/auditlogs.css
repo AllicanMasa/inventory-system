@@ -3,5 +3,22 @@
   margin: 1rem;
   padding: 1rem;
   height: auto;
-  border-radius: 1rem;
+  border-radius: .3rem;
+}
+
+.custom-datepicker-wrapper {
+  display: inline-block;
+}
+
+.custom-datepicker-input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 220px;
+  font-size: 1rem;
+}
+
+.react-datepicker {
+  font-family: inherit;
+  /* Add more overrides if needed */
 }

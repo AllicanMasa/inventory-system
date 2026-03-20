@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
+import { MdEdit, MdDelete } from "react-icons/md";
 import "../suppliers/suppliers.css";
+import Stockin from "../modal/modal";
+import ConfirmModal from "../modal/confirmmodal";
 
 const Suppliers = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add");
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  // New supplier fields
-  const [newName, setNewName] = useState("");
-  const [newPhone, setNewPhone] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-
-  // Editing fields
-  const [editingId, setEditingId] = useState(null);
-  const [editingName, setEditingName] = useState("");
-  const [editingPhone, setEditingPhone] = useState("");
-  const [editingEmail, setEditingEmail] = useState("");
-
-  const [newAddress, setNewAddress] = useState("");
-  const [editingAddress, setEditingAddress] = useState("");
+  // Form fields
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
 
   const token = localStorage.getItem("access_token");
 
-  // Fetch suppliers from backend
+  // Fetch suppliers
   const fetchSuppliers = async () => {
     try {
       const res = await fetch("http://localhost:8000/suppliers", {
@@ -41,33 +42,62 @@ const Suppliers = () => {
     fetchSuppliers();
   }, []);
 
-  // Add new supplier
-  const handleAdd = async () => {
-    if (!newName) return;
+  // Open Add Modal
+  const openAddModal = () => {
+    setModalMode("add");
+    setSelectedSupplier(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setAddress("");
+    setIsModalOpen(true);
+  };
+
+  // Open Edit Modal
+  const openEditModal = (s) => {
+    setModalMode("edit");
+    setSelectedSupplier(s);
+    setName(s.name);
+    setPhone(s.phone || "");
+    setEmail(s.email || "");
+    setAddress(s.address || "");
+    setIsModalOpen(true);
+  };
+
+  // Save (Add or Edit)
+  const handleSave = async () => {
+    if (!name) return;
+
     setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:8000/suppliers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: newName,
-          phone: newPhone,
-          email: newEmail,
-          address: newAddress,
-        }),
-      });
-      if (res.ok) {
-        setNewName("");
-        setNewPhone("");
-        setNewEmail("");
-        fetchSuppliers();
+      if (modalMode === "add") {
+        await fetch("http://localhost:8000/suppliers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, phone, email, address }),
+        });
+      } else {
+        await fetch(`http://localhost:8000/suppliers/${selectedSupplier.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, phone, email, address }),
+        });
       }
+
+      fetchSuppliers();
+      setIsModalOpen(false);
+      setSelectedSupplier(null);
     } catch (err) {
       console.error(err);
     }
+
     setLoading(false);
   };
 
@@ -84,92 +114,22 @@ const Suppliers = () => {
     }
   };
 
-  // Start editing supplier
-  const startEdit = (id, name, phone, email) => {
-    setEditingId(id);
-    setEditingName(name);
-    setEditingPhone(phone || "");
-    setEditingEmail(email || "");
-  };
-
-  // Cancel editing
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditingName("");
-    setEditingPhone("");
-    setEditingEmail("");
-  };
-
-  // Save edited supplier
-  const saveEdit = async () => {
-    if (!editingName) return;
-    try {
-      await fetch(`http://localhost:8000/suppliers/${editingId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: editingName,
-          phone: editingPhone,
-          email: editingEmail,
-          address: editingAddress,
-        }),
-      });
-      cancelEdit();
-      fetchSuppliers();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Filter suppliers based on search
-  const filtered = Array.isArray(suppliers)
-    ? suppliers.filter(
-        (s) =>
-          s.name.toLowerCase().includes(search.toLowerCase()) ||
-          (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
-          (s.email && s.email.toLowerCase().includes(search.toLowerCase())),
-      )
-    : [];
+  // Filter
+  const filtered = suppliers.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
+      (s.email && s.email.toLowerCase().includes(search.toLowerCase())),
+  );
 
   return (
     <div className="suppliers-page">
       <h2>Suppliers</h2>
 
-      {/* Add & Search */}
+      {/* Top Bar */}
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <input
-          type="text"
-          placeholder="New supplier name"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Phone"
-          value={newPhone}
-          onChange={(e) => setNewPhone(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Email"
-          value={newEmail}
-          onChange={(e) => setNewEmail(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={newAddress}
-          onChange={(e) => setNewAddress(e.target.value)}
-        />
-        <button onClick={handleAdd} disabled={loading}>
-          {loading ? "Adding..." : "Add"}
-        </button>
-      </div>
+        <button onClick={openAddModal}>+ Add Supplier</button>
 
-      <div>
         <input
           type="text"
           placeholder="Search suppliers..."
@@ -178,12 +138,8 @@ const Suppliers = () => {
         />
       </div>
 
-      {/* Suppliers Table */}
-      <table
-        border="1"
-        cellPadding="8"
-        style={{ width: "100%", borderCollapse: "collapse" }}
-      >
+      {/* Table */}
+      <table border="1" cellPadding="8" style={{ width: "100%" }}>
         <thead>
           <tr>
             <th>ID</th>
@@ -194,87 +150,101 @@ const Suppliers = () => {
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {filtered.length > 0 ? (
             filtered.map((s) => (
               <tr key={s.id}>
                 <td>{s.id}</td>
+                <td>{s.name}</td>
+                <td>{s.phone}</td>
+                <td>{s.email}</td>
+                <td>{s.address}</td>
                 <td>
-                  {editingId === s.id ? (
-                    <input
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                    />
-                  ) : (
-                    s.name
-                  )}
-                </td>
-                <td>
-                  {editingId === s.id ? (
-                    <input
-                      value={editingPhone}
-                      onChange={(e) => setEditingPhone(e.target.value)}
-                    />
-                  ) : (
-                    s.phone
-                  )}
-                </td>
-                <td>
-                  {editingId === s.id ? (
-                    <input
-                      value={editingEmail}
-                      onChange={(e) => setEditingEmail(e.target.value)}
-                    />
-                  ) : (
-                    s.email
-                  )}
-                </td>
-                <td>
-                  {editingId === s.id ? (
-                    <input
-                      value={editingAddress}
-                      onChange={(e) => setEditingAddress(e.target.value)}
-                    />
-                  ) : (
-                    s.address
-                  )}
-                </td>
-                <td>
-                  {editingId === s.id ? (
-                    <>
-                      <button onClick={saveEdit}>
-                        <MdSave />
-                      </button>
-                      <button onClick={cancelEdit}>
-                        <MdCancel />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() =>
-                          startEdit(s.id, s.name, s.phone, s.email)
-                        }
-                      >
-                        <MdEdit />
-                      </button>
-                      <button onClick={() => handleDelete(s.id)}>
-                        <MdDelete />
-                      </button>
-                    </>
-                  )}
+                  <button onClick={() => openEditModal(s)}>
+                    <MdEdit />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSupplierToDelete(s);
+                      setIsConfirmOpen(true);
+                    }}
+                  >
+                    <MdDelete />
+                  </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5" style={{ textAlign: "center" }}>
+              <td colSpan="6" style={{ textAlign: "center" }}>
                 No suppliers found.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Add/Edit Modal */}
+      <Stockin isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h3>
+          {modalMode === "add"
+            ? "Add Supplier"
+            : `Edit ${selectedSupplier?.name}`}
+        </h3>
+
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Phone"
+          value={phone}
+          maxLength={11}
+          onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
+        />
+
+        <input
+          type="text"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+
+        <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+          <button onClick={handleSave} disabled={loading || !name}>
+            {loading ? "Saving..." : modalMode === "add" ? "Save" : "Update"}
+          </button>
+        </div>
+      </Stockin>
+
+      {/* Confirm Delete */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => {
+          setIsConfirmOpen(false);
+          setSupplierToDelete(null);
+        }}
+        message={`Are you sure you want to delete "${supplierToDelete?.name}"?`}
+        onConfirm={async () => {
+          if (!supplierToDelete) return;
+          await handleDelete(supplierToDelete.id);
+          setIsConfirmOpen(false);
+          setSupplierToDelete(null);
+        }}
+      />
     </div>
   );
 };

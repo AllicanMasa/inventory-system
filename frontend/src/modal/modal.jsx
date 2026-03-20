@@ -1,5 +1,5 @@
 import React from "react";
-import "../product/product.css";
+import "../modal/modal.css";
 
 const Stockin = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -7,11 +7,12 @@ const Stockin = ({ isOpen, onClose, children }) => {
   return (
     <div className="modalOverlay">
       <div className="modalContent">
-        <button onClick={onClose} className="modalClose">
-          ×
-        </button>
 
         {children}
+
+          <button onClick={onClose} className="modalClose">
+          Close
+        </button>
       </div>
     </div>
   );

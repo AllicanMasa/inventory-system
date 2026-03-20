@@ -1,0 +1,89 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px); 
+  -webkit-backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  width: 30%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modalContent input {
+  width: 80%;
+  padding: .5rem;
+  border: 1px solid #000000;
+  border-radius: .3rem;
+  margin: auto;
+}
+
+.modalContent select {
+  width: 84%;
+  padding: .5rem;
+  border: 1px solid #000000;
+  border-radius: .3rem;
+  margin: auto;
+}
+
+.modalContent button {
+  padding: .5rem;
+  width: 50%;
+  margin: auto;
+  border: 0;
+  border-radius: 1rem;
+}
+
+.modalClose {
+  background-color: #8c8c8c;
+}
+
+.confirm-modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px); 
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: 2rem;
+}
+
+.confirm-modalContent {
+    padding: 1rem;
+  background-color: white;
+  border-radius: 0.3rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  width: 20%;
+  height: 12rem;
+  position: relative;
+}
+
+.confirm-modalContent button {
+  border-radius: 0.3rem;
+  color: #000000;
+  font-weight: 600;
+  border: 0;
+  padding: 0.8rem;
+  width: 25%;
+  margin: auto;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* smooth effect */
+}
+
+.confirm-modalContent button:hover {
+  background-color: burlywood;
+}

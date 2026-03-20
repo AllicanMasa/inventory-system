@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 
 
@@ -9,18 +10,16 @@ class ProductCreate(BaseModel):
     price: float
     min_stock: int
 
-
 class ProductResponse(ProductCreate):
     id: int
 
-    class Config:
-        from_attributes = True
-
+    model_config = {
+        "from_attributes": True
+    }
 
 class LoginRequest(BaseModel):
     email: str
     password: str
-
 
 class AuthUser(BaseModel):
     id: int
@@ -28,7 +27,6 @@ class AuthUser(BaseModel):
     email: str
     role: str
     department_id: int | None
-
 
 class LoginResponse(BaseModel):
     access_token: str
@@ -45,8 +43,9 @@ class CategoryCreate(CategoryBase):
 class Category(CategoryBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class SupplierBase(BaseModel):
     name: str
@@ -60,8 +59,9 @@ class SupplierCreate(SupplierBase):
 class Supplier(SupplierBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class UserCreate(BaseModel):
     name: str
@@ -87,17 +87,40 @@ class UserOut(BaseModel):
     department_id: Optional[int]
     status: bool
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class RoleOut(BaseModel):
     id: int
     name: str
-    class Config:
-        orm_mode = True
+
+    model_config = {
+        "from_attributes": True
+    }
 
 class DepartmentOut(BaseModel):
     id: int
     name: str
-    class Config:
-        orm_mode = True
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class AuditLogOut(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    action: str
+    created_at: datetime
+
+    @field_serializer('created_at')
+    def serialize_created_at(self, v: datetime) -> str:
+        # Force UTC representation
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
+        return v.isoformat()   # → "2026-03-19T13:56:19+00:00"
+
+    model_config = {
+        "from_attributes": True
+    }

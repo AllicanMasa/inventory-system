@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from "react";
 import "../product/product.css";
-import Modal from "../product/stockin";
+import Modal from "../modal/modal";
+import ConfirmModal from "../modal/confirmmodal";
 
 const Product = () => {
+  // ── Core / Editing states ───────────────────────────────────────
   const [open, setOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    price: "",
+    min_stock: "",
+    sku: "",
+    category_id: "",
+  });
+
+  // ── Data states ─────────────────────────────────────────────────
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [editingProduct, setEditingProduct] = useState(null);
 
-  // ── Search & Filter States ───────────────────────────────
+  // ── Delete confirmation ─────────────────────────────────────────
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
+  // ── Search & Filter states ──────────────────────────────────────
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     sku: "",
@@ -20,15 +35,7 @@ const Product = () => {
     category: "",
   });
 
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    min_stock: "",
-    sku: "",
-    category_id: "",
-  });
-
-  // Fetch categories
+  // ── Data fetching ───────────────────────────────────────────────
   useEffect(() => {
     fetch("http://127.0.0.1:8000/categories")
       .then((res) => res.json())
@@ -36,7 +43,6 @@ const Product = () => {
       .catch((err) => console.error("Failed to fetch categories", err));
   }, []);
 
-  // Fetch products
   useEffect(() => {
     fetch("http://127.0.0.1:8000/products")
       .then((res) => res.json())
@@ -44,6 +50,19 @@ const Product = () => {
       .catch((err) => console.error("Failed to fetch products", err));
   }, []);
 
+  // ── Helpers ─────────────────────────────────────────────────────
+  const categoryMap = Object.fromEntries(
+    categories.map((cat) => [cat.id, cat.name])
+  );
+
+  const isFormValid =
+    form.name.trim() !== "" &&
+    form.price !== "" &&
+    form.min_stock !== "" &&
+    form.sku !== "" &&
+    form.category_id !== "";
+
+  // ── Form handlers ───────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -71,23 +90,37 @@ const Product = () => {
     setForm({ ...form, [name]: value });
   };
 
-  const isFormValid =
-    form.name.trim() !== "" &&
-    form.price !== "" &&
-    form.min_stock !== "" &&
-    form.sku !== "" &&
-    form.category_id !== "";
+  const resetForm = () => {
+    setForm({
+      name: "",
+      price: "",
+      min_stock: "",
+      sku: "",
+      category_id: "",
+    });
+    setEditingProduct(null);
+  };
 
+  // ── CRUD operations ─────────────────────────────────────────────
   const handleSubmit = async () => {
     try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You are not logged in");
+        return;
+      }
+
       const method = editingProduct ? "PUT" : "POST";
       const url = editingProduct
         ? `http://127.0.0.1:8000/products/${editingProduct.id}`
-        : "http://127.0.0.1:8000/products";
+        : "http://127.0.0.1:8000/products/";
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(form),
       });
 
@@ -103,15 +136,8 @@ const Product = () => {
         alert("Product added!");
       }
 
-      setEditingProduct(null);
+      resetForm();
       setOpen(false);
-      setForm({
-        name: "",
-        price: "",
-        min_stock: "",
-        sku: "",
-        category_id: "",
-      });
     } catch (err) {
       console.error(err);
       alert(err.message || "Something went wrong");
@@ -130,26 +156,32 @@ const Product = () => {
     setOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this product?")) return;
+  const handleDelete = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/products/${id}`, {
-        method: "DELETE",
-      });
+      const token = localStorage.getItem("access_token");
+
+      const res = await fetch(
+        `http://127.0.0.1:8000/products/${selectedProductId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!res.ok) throw new Error("Failed to delete");
-      setProducts(products.filter((p) => p.id !== id));
-      alert("Product deleted");
+
+      setProducts(products.filter((p) => p.id !== selectedProductId));
+      setIsDeleteOpen(false);
+      setSelectedProductId(null);
     } catch (err) {
       console.error(err);
       alert(err.message || "Delete failed");
     }
   };
 
-  const categoryMap = Object.fromEntries(
-    categories.map((cat) => [cat.id, cat.name]),
-  );
-
-  // ── Filtering Logic ───────────────────────────────────────
+  // ── Filtering logic ─────────────────────────────────────────────
   const filteredProducts = products
     .filter((p) => {
       const term = searchTerm.toLowerCase().trim();
@@ -162,7 +194,8 @@ const Product = () => {
       );
     })
     .filter((p) => {
-      if (filters.sku && !p.sku.toString().includes(filters.sku)) return false;
+      if (filters.sku && !p.sku.toString().includes(filters.sku))
+        return false;
       if (
         filters.name &&
         !p.name.toLowerCase().includes(filters.name.toLowerCase())
@@ -191,24 +224,33 @@ const Product = () => {
       return true;
     });
 
+  // ── UI handlers ─────────────────────────────────────────────────
+  const openAddModal = () => {
+    resetForm();
+    setOpen(true);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setFilters({
+      sku: "",
+      name: "",
+      priceMin: "",
+      priceMax: "",
+      minStockMin: "",
+      minStockMax: "",
+      category: "",
+    });
+  };
+
+  // ────────────────────────────────────────────────────────────────
+  // RENDER
+  // ────────────────────────────────────────────────────────────────
   return (
     <div className="product">
       <h2>Product Management</h2>
 
-      <button
-        className="open-btn"
-        onClick={() => {
-          setEditingProduct(null);
-          setForm({
-            name: "",
-            price: "",
-            min_stock: "",
-            sku: "",
-            category_id: "",
-          });
-          setOpen(true);
-        }}
-      >
+      <button className="open-btn" onClick={openAddModal}>
         Add New Item
       </button>
 
@@ -291,7 +333,7 @@ const Product = () => {
           style={{ width: "100%", borderCollapse: "collapse" }}
         >
           <thead>
-            <tr style={{ background: "#f4f4f4" }}>
+            <tr style={{ background: "#fafafa" }}>
               <th>SKU</th>
               <th>Product Name</th>
               <th>Price</th>
@@ -378,18 +420,7 @@ const Product = () => {
               </th>
               <th style={{ textAlign: "center" }}>
                 <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setFilters({
-                      sku: "",
-                      name: "",
-                      priceMin: "",
-                      priceMax: "",
-                      minStockMin: "",
-                      minStockMax: "",
-                      category: "",
-                    });
-                  }}
+                  onClick={clearFilters}
                   style={{
                     padding: "0.4rem 0.8rem",
                     fontSize: "0.9rem",
@@ -402,7 +433,7 @@ const Product = () => {
                 >
                   Clear
                 </button>
-              </th>{" "}
+              </th>
             </tr>
           </thead>
 
@@ -426,7 +457,12 @@ const Product = () => {
                   <td>{categoryMap[product.category_id] || "—"}</td>
                   <td>
                     <button onClick={() => handleEdit(product)}>Edit</button>
-                    <button onClick={() => handleDelete(product.id)}>
+                    <button
+                      onClick={() => {
+                        setSelectedProductId(product.id);
+                        setIsDeleteOpen(true);
+                      }}
+                    >
                       Delete
                     </button>
                   </td>
@@ -436,6 +472,13 @@ const Product = () => {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this product?"
+      />
     </div>
   );
 };

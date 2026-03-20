@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
-import '../categories/categories.css'
+import '../categories/categories.css';
+import ConfirmModal from "../modal/confirmmodal"; // import it
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -9,6 +10,9 @@ const Categories = () => {
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState("");
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const token = localStorage.getItem("access_token");
 
@@ -24,7 +28,6 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  // Add a new category
   const handleAdd = async () => {
     if (!newName) return;
     setLoading(true);
@@ -43,7 +46,6 @@ const Categories = () => {
     setLoading(false);
   };
 
-  // Delete a category
   const handleDelete = async (id) => {
     await fetch(`http://localhost:8000/categories/${id}`, {
       method: "DELETE",
@@ -52,19 +54,16 @@ const Categories = () => {
     fetchCategories();
   };
 
-  // Start editing
   const startEdit = (id, name) => {
     setEditingId(id);
     setEditingName(name);
   };
 
-  // Cancel editing
   const cancelEdit = () => {
     setEditingId(null);
     setEditingName("");
   };
 
-  // Save edited category
   const saveEdit = async () => {
     if (!editingName) return;
     await fetch(`http://localhost:8000/categories/${editingId}`, {
@@ -75,12 +74,10 @@ const Categories = () => {
       },
       body: JSON.stringify({ name: editingName }),
     });
-    setEditingId(null);
-    setEditingName("");
+    cancelEdit();
     fetchCategories();
   };
 
-  // Filtered categories
   const filtered = categories.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -144,7 +141,12 @@ const Categories = () => {
                     <button onClick={() => startEdit(c.id, c.name)}>
                       <MdEdit />
                     </button>
-                    <button onClick={() => handleDelete(c.id)}>
+                    <button
+                      onClick={() => {
+                        setCategoryToDelete(c);
+                        setIsConfirmOpen(true);
+                      }}
+                    >
                       <MdDelete />
                     </button>
                   </>
@@ -154,13 +156,24 @@ const Categories = () => {
           ))}
           {filtered.length === 0 && (
             <tr>
-              <td colSpan="3" style={{ textAlign: "center" }}>
+              <td colSpan="2" style={{ textAlign: "center" }}>
                 No categories found.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        message={`Are you sure you want to delete "${categoryToDelete?.name}"?`}
+        onConfirm={async () => {
+          await handleDelete(categoryToDelete.id);
+          setIsConfirmOpen(false);
+        }}
+      />
     </div>
   );
 };

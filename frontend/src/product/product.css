@@ -3,34 +3,5 @@
   margin: 1rem;
   padding: 1rem;
   height: auto;
-  border-radius: 1rem;
-}
-
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.modalContent {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  padding: 24px;
-  width: 80%;
-  position: relative;
-}
-
-.modalClose {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  background: none;
-  border: none;
+  border-radius: .3rem;
 }

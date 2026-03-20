@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../navbar/navbar.css";
 import {
   MdSpaceDashboard,
@@ -8,10 +8,10 @@ import {
   MdOutlineInventory2,
   MdOutlineAdminPanelSettings,
 } from "react-icons/md";
-import { AiOutlineProduct } from "react-icons/ai";
-import { FaUser } from "react-icons/fa";
+import { IoLogOutOutline } from "react-icons/io5";
+import { AiOutlineProduct, AiOutlineAudit } from "react-icons/ai";
 
-// ✅ keep this (from your branch)
+// Permissions helper
 const hasPermission = (permissions, requiredPrefixes) =>
   requiredPrefixes.some((prefix) =>
     permissions.some(
@@ -23,45 +23,15 @@ const hasPermission = (permissions, requiredPrefixes) =>
 const Navbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
-
-  // ✅ keep permissions logic
-
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-
-  console.log("USER:", user);
-  console.log("PERMISSIONS:", permissions);
-
-  const canViewDashboard = hasPermission(permissions, [
-    "products:view",
-    "products:manage",
-    "users:manage",
-  ]);
-
-  const canManageProducts = hasPermission(permissions, [
-    "products:manage",
-    "products:view",
-  ]);
-
-  const canManageCategories = hasPermission(permissions, ["categories:manage"]);
-
-  const canManageSuppliers = hasPermission(permissions, ["suppliers:manage"]);
-
-  const canUseInventory = hasPermission(permissions, ["stock:in", "stock:out"]);
-
-  const canManageUsers = hasPermission(permissions, ["users:manage"]);
-
-  const canViewAuditLogs = hasPermission(permissions, ["audit_logs:view"]);
 
   const handleLogout = async () => {
     const token = localStorage.getItem("access_token");
-
     try {
       if (token) {
         await fetch("http://localhost:8000/auth/logout", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
       }
     } finally {
@@ -73,75 +43,111 @@ const Navbar = () => {
   };
 
   return (
-    <div>
-      <section className="menu">
-        <h2>RTW</h2>
+    <section className="menu">
+      <h2>RTW</h2>
+      <p className="sub-label">ready to wear.</p>
 
-        {/* ✅ clean version */}
-        {user && (
-          <p style={{color: "white"}}>
-            Welcome {user.name} ({user.role})
-          </p>
+      {user && <p className="user-name">Welcome, {user.name}!</p>}
+
+      <section className="options">
+        {hasPermission(permissions, [
+          "products:view",
+          "products:manage",
+          "users:manage",
+        ]) && (
+          <NavLink
+            to="/home/dashboard"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <MdSpaceDashboard className="icon" />
+            <span className="nav-text">Dashboard</span>
+          </NavLink>
         )}
 
-        <section className="options">
-          {canViewDashboard && (
-            <Link to="/home/dashboard" className="nav-item">
-              <MdSpaceDashboard className="icon" />
-              <span className="nav-text">Dashboard</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["products:manage", "products:view"]) && (
+          <NavLink
+            to="/home/product"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <MdOutlineProductionQuantityLimits className="icon" />
+            <span className="nav-text">Products</span>
+          </NavLink>
+        )}
 
-          {canManageProducts && (
-            <Link to="/home/product" className="nav-item">
-              <MdOutlineProductionQuantityLimits className="icon" />
-              <span className="nav-text">Products</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["categories:manage"]) && (
+          <NavLink
+            to="/home/categories"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <MdOutlineCategory className="icon" />
+            <span className="nav-text">Categories</span>
+          </NavLink>
+        )}
 
-          {canManageCategories && (
-            <Link to="/home/categories" className="nav-item">
-              <MdOutlineCategory className="icon" />
-              <span className="nav-text">Categories</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["suppliers:manage"]) && (
+          <NavLink
+            to="/home/suppliers"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <AiOutlineProduct className="icon" />
+            <span className="nav-text">Suppliers</span>
+          </NavLink>
+        )}
 
-          {canManageSuppliers && (
-            <Link to="/home/suppliers" className="nav-item">
-              <AiOutlineProduct className="icon" />
-              <span className="nav-text">Suppliers</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["stock:in", "stock:out"]) && (
+          <NavLink
+            to="/home/inventory"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <MdOutlineInventory2 className="icon" />
+            <span className="nav-text">Inventory</span>
+          </NavLink>
+        )}
 
-          {canUseInventory && (
-            <Link to="/home/inventory" className="nav-item">
-              <MdOutlineInventory2 className="icon" />
-              <span className="nav-text">Inventory</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["users:manage"]) && (
+          <NavLink
+            to="/home/users"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <MdOutlineAdminPanelSettings className="icon" />
+            <span className="nav-text">Users</span>
+          </NavLink>
+        )}
 
-          {canManageUsers && (
-            <Link to="/home/users" className="nav-item">
-              <MdOutlineAdminPanelSettings className="icon" />
-              <span className="nav-text">Users</span>
-            </Link>
-          )}
+        {hasPermission(permissions, ["audit_logs:view"]) && (
+          <NavLink
+            to="/home/audit-logs"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <AiOutlineAudit className="icon" />
+            <span className="nav-text">Audit Logs</span>
+          </NavLink>
+        )}
 
-          {canViewAuditLogs && (
-            <Link to="/home/audit-logs" className="nav-item">
-              <FaUser className="icon" />
-              <span className="nav-text">Audit Logs</span>
-            </Link>
-          )}
-
-          {/* ✅ FIXED logout section (no duplicate/broken code) */}
-          <button type="button" className="nav-item" onClick={handleLogout}>
-            <FaUser className="icon" />
-            <span className="nav-text">Logout</span>
-          </button>
-        </section>
+        <button
+          type="button"
+          className="nav-item logout"
+          onClick={handleLogout}
+        >
+          <IoLogOutOutline className="icon" />
+          <span className="nav-text">Logout</span>
+        </button>
       </section>
-    </div>
+    </section>
   );
 };
 
