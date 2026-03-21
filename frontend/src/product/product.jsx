@@ -52,7 +52,7 @@ const Product = () => {
 
   // ── Helpers ─────────────────────────────────────────────────────
   const categoryMap = Object.fromEntries(
-    categories.map((cat) => [cat.id, cat.name])
+    categories.map((cat) => [cat.id, cat.name]),
   );
 
   const isFormValid =
@@ -167,7 +167,7 @@ const Product = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!res.ok) throw new Error("Failed to delete");
@@ -194,8 +194,7 @@ const Product = () => {
       );
     })
     .filter((p) => {
-      if (filters.sku && !p.sku.toString().includes(filters.sku))
-        return false;
+      if (filters.sku && !p.sku.toString().includes(filters.sku)) return false;
       if (
         filters.name &&
         !p.name.toLowerCase().includes(filters.name.toLowerCase())
@@ -248,11 +247,6 @@ const Product = () => {
   // ────────────────────────────────────────────────────────────────
   return (
     <div className="product">
-      <h2>Product Management</h2>
-
-      <button className="open-btn" onClick={openAddModal}>
-        Add New Item
-      </button>
 
       <Modal isOpen={open} onClose={() => setOpen(false)}>
         <h2>{editingProduct ? "Edit Product" : "New Item Information"}</h2>
@@ -308,8 +302,6 @@ const Product = () => {
       </Modal>
 
       <div style={{ margin: "1.5rem 0" }}>
-        <h3>Products ({filteredProducts.length})</h3>
-
         {/* Global Search */}
         <div style={{ marginBottom: "1rem" }}>
           <input
@@ -326,6 +318,12 @@ const Product = () => {
             }}
           />
         </div>
+
+        <h3>Products ({filteredProducts.length})</h3>
+
+        <button className="open-btn" onClick={openAddModal}>
+        Add New Item
+      </button>
 
         <table
           border="1"

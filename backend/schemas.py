@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel, field_serializer
-from typing import Optional
+from typing import Optional, Literal
 
 
 class ProductCreate(BaseModel):
@@ -124,3 +124,11 @@ class AuditLogOut(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class StockRequest(BaseModel):
+    product_id: int
+    # This enforces that only the values allowed by your DB can be used
+    type: Literal["stock_in", "stock_out"] 
+    quantity: int
+    direction: Optional[str] = None
+    notes: Optional[str] = None

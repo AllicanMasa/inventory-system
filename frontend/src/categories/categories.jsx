@@ -84,8 +84,6 @@ const Categories = () => {
 
   return (
     <div className="categories-page">
-      <h2>Categories</h2>
-
       {/* Add + Search */}
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
         <input

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import '../home/home.css'
 
 const DateTime = () => {
   const [time, setTime] = useState(new Date());
@@ -12,21 +13,11 @@ const DateTime = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        textAlign: "center",
-        margin: 0,
-        padding: 0,
-      }}
-    >
-      <h2>{time.toLocaleTimeString()}</h2>
+    <div className="date-time">
+      <p className="time">{time.toLocaleTimeString()}</p>
+      <p>•</p>
 
-      <p
-        style={{
-          fontSize: "1.5rem",
-          marginTop: "-2rem",
-        }}
-      >
+      <p className="date">
         {time.toLocaleDateString("en-US", {
           weekday: "long",
           year: "numeric",

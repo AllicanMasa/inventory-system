@@ -1,0 +1,23 @@
+.inventory-page {
+  background-color: rgb(255, 255, 255);
+  margin: 1rem;
+  padding: 1rem;
+  height: auto;
+  border-radius: .3rem;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table td,
+.inventory-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.low-stock {
+  color: red;
+  font-weight: bold;
+}

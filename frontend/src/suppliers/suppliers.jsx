@@ -124,7 +124,6 @@ const Suppliers = () => {
 
   return (
     <div className="suppliers-page">
-      <h2>Suppliers</h2>
 
       {/* Top Bar */}
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>

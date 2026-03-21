@@ -1,5 +1,3 @@
-// users.jsx (FULL CLEAN VERSION WITH REUSABLE FORM + MODALS)
-
 import React, { useEffect, useState } from "react";
 import { MdEdit, MdDelete } from "react-icons/md";
 import Modal from "../modal/modal";
@@ -110,9 +108,13 @@ const Users = () => {
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    fetchRoles();
-    fetchDepartments();
-    fetchUsers();
+    const init = async () => {
+      await fetchRoles();
+      await fetchDepartments();
+      await fetchUsers();
+    };
+
+    init();
   }, []);
 
   const fetchRoles = async () => {
@@ -130,10 +132,20 @@ const Users = () => {
   };
 
   const fetchUsers = async () => {
-    const res = await fetch("http://localhost:8000/users", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setUsers(await res.json());
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      console.log("USERS:", data);
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ✅ Add User
@@ -150,9 +162,7 @@ const Users = () => {
       body: JSON.stringify({
         ...form,
         role_id: Number(form.role_id),
-        department_id: form.department_id
-          ? Number(form.department_id)
-          : null,
+        department_id: form.department_id ? Number(form.department_id) : null,
         password: form.password || "default123",
       }),
     });
@@ -160,7 +170,7 @@ const Users = () => {
     if (res.ok) {
       setIsAddOpen(false);
       resetForm();
-      fetchUsers();
+      await fetchUsers();
     }
 
     setLoading(false);
@@ -179,9 +189,7 @@ const Users = () => {
       body: JSON.stringify({
         ...form,
         role_id: Number(form.role_id),
-        department_id: form.department_id
-          ? Number(form.department_id)
-          : null,
+        department_id: form.department_id ? Number(form.department_id) : null,
         password: form.password || undefined,
       }),
     });
@@ -231,17 +239,25 @@ const Users = () => {
     const deptName =
       departments.find((d) => d.id === u.department_id)?.name || "";
 
+    const keyword = search.toLowerCase();
+
     return (
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      roleName.toLowerCase().includes(search.toLowerCase()) ||
-      deptName.toLowerCase().includes(search.toLowerCase())
+      (u.name || "").toLowerCase().includes(keyword) ||
+      (u.email || "").toLowerCase().includes(keyword) ||
+      roleName.toLowerCase().includes(keyword) ||
+      deptName.toLowerCase().includes(keyword)
     );
   });
 
   return (
     <div className="users-page">
-      <h2>Users</h2>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+        <input
+          placeholder="Search users..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
         <button onClick={() => setIsAddOpen(true)}>Add User</button>
@@ -253,6 +269,8 @@ const Users = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        <button onClick={fetchUsers}>Refresh</button>
       </div>
 
       <table border="1" cellPadding="8" style={{ width: "100%" }}>

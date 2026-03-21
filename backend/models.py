@@ -75,8 +75,9 @@ class StockTransaction(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     department_id = Column(Integer, ForeignKey("departments.id"))
     type = Column(String)
+    direction = Column(String)
     quantity = Column(Integer)
-
+    notes = Column(String)
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"

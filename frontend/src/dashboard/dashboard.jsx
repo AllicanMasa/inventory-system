@@ -10,14 +10,11 @@ import { FaSortAmountUp } from "react-icons/fa";
 import { MdOutlineAssignmentReturned } from "react-icons/md";
 import Saleschart from "../dashboard/saleschart";
 import Inventory from "../dashboard/inventorychart";
-import DateTime from "../dashboard/datetime";
 
 
 const Dashboard = () => {
   return (
     <div className="dashboard">
-      <h2>Dashboard</h2>
-      <h1><DateTime/></h1>
       <section className="container">
         <section className="sales">
           <h3>Sales Overview</h3>

@@ -77,8 +77,6 @@ const AuditLogs = () => {
 
   return (
     <div className="audit-logs-page">
-      <h2>Audit Logs ({filteredLogs.length})</h2>
-
       <div
         style={{
           display: "flex",
