@@ -26,26 +26,27 @@ def get_dashboard_stats(db: Session = Depends(get_db), current_user = Depends(ge
     p_amount = 0
 
     for t in all_transactions:
-        # Get the price safely
         price = t.variant.product.price if (t.variant and t.variant.product) else 0
         t_date = t.timestamp.date()
 
-        # Sales logic (Stock Out)
-        if t.type == "stock_out":
+        # 1. Handle Returns separately
+        if t.type == "return":
+            r_count += 1
+            # Optional: Decide if returns should affect "Stock In/Out" totals. 
+            # Usually, you keep them separate for clean data.
+
+        # 2. Regular Stock Out
+        elif t.type == "stock_out":
             stock_out_count += 1
             m_sales += (t.quantity * price)
             if t_date == today:
                 d_sales += (t.quantity * price)
         
-        # Purchase logic (Stock In)
+        # 3. Regular Stock In
         elif t.type == "stock_in":
             p_count += 1
             p_amount += (t.quantity * price)
-
-        # Return logic
-        elif t.type.lower() in ["return", "returned"]:
-            r_count += 1
-
+            
     return {
         "totalProducts": total_prods,
         "monthlySales": m_sales,

@@ -227,7 +227,7 @@ const Suppliers = () => {
           onChange={(e) => setAddress(e.target.value)}
         />
 
-        <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+        <div style={{ marginTop: "10px", display: "flex", gap: "10px", width: "95%"}}>
           <button onClick={handleSave} disabled={loading || !name}>
             {loading ? "Saving..." : modalMode === "add" ? "Save" : "Update"}
           </button>

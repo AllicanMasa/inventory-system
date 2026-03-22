@@ -56,7 +56,7 @@
 .btn-edit {
   background-color: #ffdd00;
   border: 0;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
   color: #000000;
   font-weight: 600;
 }
@@ -64,7 +64,7 @@
 .btn-add-sub {
   background-color: #48ff00;
   border: 0;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
   color: #000000;
   font-weight: 600;
 }
@@ -72,7 +72,7 @@
 .btn-delete-text {
   background-color: #ff0000;
   border: 0;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
   color: #ffffff;
   font-weight: 600;
 }
@@ -82,13 +82,17 @@
 }
 
 .form-row select {
-  width: 79%;
+  width: 94%;
 }
 
 .modal-form-content {
-  width: 80%;
+  width: 75%;
+}
+
+.modal-form-content select {
+  width: 95%;
 }
 
 .modal-form-content label {
-  font-size: .8rem;
+  font-size: 0.8rem;
 }

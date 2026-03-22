@@ -390,6 +390,7 @@ const Product = () => {
           />
           <label>Category</label>
           <select
+            className="size"
             name="category_id"
             value={productForm.category_id}
             onChange={handleProductChange}
@@ -404,26 +405,27 @@ const Product = () => {
           <div className="divider" />
 
           <h3>Variant Specifics</h3>
-              <label>Color</label>
-              <input
-                name="v_color"
-                value={variantForm.v_color}
-                onChange={handleVariantChange}
-              />
-              <label>Size</label>
-              <select
-                name="v_size"
-                value={variantForm.v_size}
-                onChange={handleVariantChange}
-              >
-                <option value="">Select Size</option>
-                <option value="XS">XS</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-                <option value="XXL">XXL</option>
-              </select>
+          <label>Color</label>
+          <input
+            name="v_color"
+            value={variantForm.v_color}
+            onChange={handleVariantChange}
+          />
+          <label>Size</label>
+          <select
+            className="size"
+            name="v_size"
+            value={variantForm.v_size}
+            onChange={handleVariantChange}
+          >
+            <option value="">Select Size</option>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
         </div>
         <button
           className="btn-save"

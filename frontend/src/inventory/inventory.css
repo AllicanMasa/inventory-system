@@ -51,7 +51,7 @@
   font-weight: 600;
   color: #ffffff;
   background-color: #0048ff;
-  transition-duration: .5s;
+  transition-duration: 0.5s;
 }
 
 .view-history:hover {
@@ -108,4 +108,24 @@
 .badge-neutral {
   background-color: #e2e3e5;
   color: #383d41;
+}
+
+.stocktrans {
+  width: 90%;
+  margin: auto;
+}
+
+.stocktrans input{
+  width: 96%;
+  margin: auto;
+  margin-bottom: 0.3rem;
+}
+
+.stocktrans select {
+  width: 100%;
+  margin-bottom: 0.3rem;
+}
+
+.stocktrans button {
+  width: 100%;
 }

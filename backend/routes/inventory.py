@@ -81,14 +81,14 @@ def stock_transaction(
             raise HTTPException(status_code=400, detail="Direction (IN/OUT) required for Returns")
         
         db_direction = direction_input
+        db_type = "return"  # <--- FIX: Force the type to stay "return"
+        
         if direction_input == "IN":
             variant.quantity += quantity
-            db_type = "stock_in"
         else:
             if variant.quantity < quantity:
                 raise HTTPException(status_code=400, detail="Insufficient stock to return to supplier")
             variant.quantity -= quantity
-            db_type = "stock_out"
 
     # 3. Save Transaction
     try:

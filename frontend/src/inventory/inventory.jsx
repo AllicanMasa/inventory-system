@@ -203,58 +203,61 @@ const Inventory = () => {
       <Modal isOpen={open} onClose={() => setOpen(false)}>
         <h3>Stock Transaction</h3>
         <form onSubmit={handleSubmit}>
-          <select value={form.type} onChange={handleTypeChange} required>
-            <option value="">Select Type</option>
-            <option value="IN">Stock In</option>
-            <option value="OUT">Stock Out</option>
-            <option value="RETURN">Return</option>
-          </select>
-
-          {form.type === "IN" && (
-            <select
-              value={form.supplier_id}
-              onChange={(e) =>
-                setForm({ ...form, supplier_id: e.target.value })
-              }
-              required
-            >
-              <option value="">Select Supplier</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
+          <div className="stocktrans">
+            <select value={form.type} onChange={handleTypeChange} required>
+              <option value="">Select Type</option>
+              <option value="IN">Stock In</option>
+              <option value="OUT">Stock Out</option>
+              <option value="RETURN">Return</option>
             </select>
-          )}
 
-          {form.type === "RETURN" && (
-            <select
-              value={form.direction}
-              onChange={(e) => setForm({ ...form, direction: e.target.value })}
+            {form.type === "IN" && (
+              <select
+                value={form.supplier_id}
+                onChange={(e) =>
+                  setForm({ ...form, supplier_id: e.target.value })
+                }
+                required
+              >
+                <option value="">Select Supplier</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {form.type === "RETURN" && (
+              <select
+                value={form.direction}
+                onChange={(e) =>
+                  setForm({ ...form, direction: e.target.value })
+                }
+                required
+              >
+                <option value="">Select Direction</option>
+                <option value="IN">Return from Department</option>
+                <option value="OUT">Return to Supplier</option>
+              </select>
+            )}
+
+            <input
+              type="number"
+              placeholder="Quantity"
+              value={form.quantity}
+              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
               required
-            >
-              <option value="">Select Direction</option>
-              <option value="IN">Return from Department</option>
-              <option value="OUT">Return to Supplier</option>
-            </select>
-          )}
+              min="1"
+            />
 
-          <input
-            type="number"
-            placeholder="Quantity"
-            value={form.quantity}
-            onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            required
-            min="1"
-          />
-
-          <textarea
-            placeholder="Notes (optional)"
-            value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
-          />
-
-          <button type="submit">Submit</button>
+            <input
+              placeholder="Notes (optional)"
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            />
+            <button type="submit">Submit</button>
+          </div>
         </form>
       </Modal>
     </div>

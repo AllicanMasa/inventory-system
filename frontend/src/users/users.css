@@ -88,3 +88,17 @@
   color: #ffffff;
   font-weight: 600;
 }
+
+.user-form {
+  width: 80%;
+  text-align: center;
+}
+
+.user-form select{
+  width: 94%;
+  margin-bottom: .3rem;
+}
+
+.user-form button {
+  width: 65%;
+}
