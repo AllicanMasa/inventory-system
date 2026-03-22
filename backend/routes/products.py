@@ -1,21 +1,46 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
-from backend import crud, schemas, models
-from backend.audit import log_action
+from backend import models, schemas, crud
 from backend.database import get_db
 from backend.dependencies import get_current_user, require_permission
+from backend.audit import log_action
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-# ✅ PUBLIC (or you can protect this too)
+# ------------------ HELPERS ------------------
+
+def generate_sku(base_sku: str, color: str, size: str) -> str:
+    def format_val(val):
+        return (val or "NA").upper().replace(" ", "-")
+    return f"{base_sku}-{format_val(color)}-{format_val(size)}"
+
+
+def check_duplicate_variant(db, product_id, size, color):
+    existing = db.query(models.ProductVariant).filter_by(
+        product_id=product_id,
+        size=size,
+        color=color
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Variant already exists (same color and size)"
+        )
+
+
+# ------------------ GET ALL PRODUCTS ------------------
+
 @router.get("/")
 def get_products(db: Session = Depends(get_db)):
     return crud.get_products(db)
 
 
-# ✅ CREATE PRODUCT
+# ------------------ CREATE PRODUCT ------------------
+
 @router.post("/")
 def create_product(
     product: schemas.ProductCreate,
@@ -23,21 +48,47 @@ def create_product(
     current_user: models.User = Depends(get_current_user),
     _: bool = Depends(require_permission("products:manage")),
 ):
-    new_product = models.Product(**product.dict())
+    product_data = product.dict(exclude={"variants"})
+    new_product = models.Product(**product_data)
+
     db.add(new_product)
-    db.commit()
+    db.flush()  # get ID
+
+    try:
+        if product.variants:
+            for var in product.variants:
+                check_duplicate_variant(
+                    db, new_product.id, var.size, var.color
+                )
+
+                new_variant = models.ProductVariant(
+                    product_id=new_product.id,
+                    size=var.size,
+                    color=var.color,
+                    sku=generate_sku(new_product.sku, var.color, var.size),
+                    quantity=var.quantity or 0,
+                )
+                db.add(new_variant)
+
+        db.commit()
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Duplicate SKU or invalid data")
+
     db.refresh(new_product)
 
     log_action(
         db,
         current_user.id,
-        f"Created product {new_product.name} (id={new_product.id})",
+        f"Created product {new_product.name} (id={new_product.id})"
     )
 
     return new_product
 
 
-# ✅ UPDATE PRODUCT
+# ------------------ UPDATE PRODUCT ------------------
+
 @router.put("/{id}")
 def update_product(
     id: int,
@@ -49,45 +100,113 @@ def update_product(
     db_product = db.query(models.Product).filter(models.Product.id == id).first()
 
     if not db_product:
-        return {"error": "Product not found"}
+        raise HTTPException(status_code=404, detail="Product not found")
 
-    for key, value in product.dict().items():
-        setattr(db_product, key, value)
+    incoming_data = product.dict(exclude_unset=True)
 
-    db.commit()
+    for key, value in incoming_data.items():
+        if key != "variants":
+            setattr(db_product, key, value)
+
+    try:
+        if incoming_data.get("variants") is not None:
+            db_product.variants.clear()
+
+            for var in product.variants: # type: ignore
+                check_duplicate_variant(db, id, var.size, var.color)
+
+                new_variant = models.ProductVariant(
+                    product_id=id,
+                    size=var.size,
+                    color=var.color,
+                    sku=generate_sku(db_product.sku, var.color, var.size),
+                    quantity=var.quantity or 0,
+                )
+                db_product.variants.append(new_variant)
+
+        db.commit()
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Duplicate SKU or invalid update")
+
     db.refresh(db_product)
 
     log_action(
         db,
         current_user.id,
-        f"Updated product {db_product.name} (id={db_product.id})",
+        f"Updated product {db_product.name} (id={id})"
     )
 
     return db_product
 
 
-# ✅ DELETE PRODUCT
-@router.delete("/{id}")
+# ------------------ DELETE PRODUCT ------------------
+
+@router.delete("/{product_id}")
 def delete_product(
-    id: int,
+    product_id: int, 
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
     _: bool = Depends(require_permission("products:manage")),
 ):
-    product = db.query(models.Product).filter(models.Product.id == id).first()
-
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    
     if not product:
-        return {"error": "Product not found"}
-
-    deleted_name = product.name
+        raise HTTPException(status_code=404, detail="Product not found")
 
     db.delete(product)
     db.commit()
+    
+    log_action(
+        db,
+        current_user.id,
+        f"Deleted product {product.name} (id={product_id})"
+    )
+    
+    return {"message": "Product deleted successfully"}
+
+
+# ------------------ ADD VARIANT ------------------
+
+@router.post("/{product_id}/variants")
+def add_variant_to_product(
+    product_id: int,
+    variant: schemas.VariantBase,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    _: bool = Depends(require_permission("products:manage")),
+):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Prevent duplicate color + size
+    check_duplicate_variant(db, product_id, variant.size, variant.color)
+
+    new_variant = models.ProductVariant(
+        product_id=product_id,
+        size=variant.size,
+        color=variant.color,
+        sku=generate_sku(product.sku, variant.color, variant.size),
+        quantity=variant.quantity or 0,
+    )
+
+    db.add(new_variant)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="SKU already exists")
+
+    db.refresh(product)
 
     log_action(
         db,
         current_user.id,
-        f"Deleted product {deleted_name} (id={id})",
+        f"Added variant {new_variant.sku} to product {product.name} (id={product_id})",
     )
 
-    return {"message": "Product deleted"}
+    return product

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from backend import models
+from sqlalchemy.orm import joinedload
 
 
 def create_product(db: Session, product):
@@ -11,4 +12,8 @@ def create_product(db: Session, product):
 
 
 def get_products(db: Session):
-    return db.query(models.Product).all()
+    return (
+        db.query(models.Product)
+        .options(joinedload(models.Product.variants))   # ← this is the key line
+        .all()
+    )

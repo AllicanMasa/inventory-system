@@ -12,7 +12,7 @@ const AuditLogs = () => {
 
   // Controls how many rows are currently visible
   const [visibleCount, setVisibleCount] = useState(15);
-  const BATCH_SIZE = 12;
+  const BATCH_SIZE = 10;
 
   const token = localStorage.getItem("access_token");
 
@@ -77,29 +77,16 @@ const AuditLogs = () => {
 
   return (
     <div className="audit-logs-page">
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
+      <div className="audit-header">
         <input
+          className="search-input"
           type="text"
           placeholder="Search action or date..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: "280px",
-            padding: "0.5rem",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-          }}
         />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div>
           <DatePicker
             selectsRange={true}
             startDate={startDate}
@@ -114,33 +101,9 @@ const AuditLogs = () => {
             wrapperClassName="custom-datepicker-wrapper"
           />
         </div>
-
-        {(search || startDate || endDate) && (
-          <button
-            onClick={() => {
-              setSearch("");
-              setDateRange([null, null]);
-            }}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#f44336",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "0.95rem",
-            }}
-          >
-            Clear Filters
-          </button>
-        )}
       </div>
 
-      <table
-        border="1"
-        cellPadding="8"
-        style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}
-      >
+      <table className="audit-table">
         <thead>
           <tr style={{ backgroundColor: "#f5f5f5" }}>
             <th>ID</th>

@@ -1,7 +1,94 @@
-.product {
+.product-page {
   background-color: rgb(255, 255, 255);
   margin: 1rem;
   padding: 1rem;
-  height: auto;
+  border-radius: 0.3rem;
+}
+
+.product-header {
+  padding: 1rem;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.btn-primary {
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  background-color: #2bff00;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.product-table td,
+.product-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.product-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.btn-edit,
+.btn-add-sub,
+.btn-delete-text {
+  padding: 0.3rem;
+  width: 25%;
+  margin-right: 0.3rem;
+}
+
+.btn-edit {
+  background-color: #ffdd00;
+  border: 0;
   border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-add-sub {
+  background-color: #48ff00;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-delete-text {
+  background-color: #ff0000;
+  border: 0;
+  border-radius: .3rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.form-row {
+  width: 80%;
+}
+
+.form-row select {
+  width: 79%;
+}
+
+.modal-form-content {
+  width: 80%;
+}
+
+.modal-form-content label {
+  font-size: .8rem;
 }

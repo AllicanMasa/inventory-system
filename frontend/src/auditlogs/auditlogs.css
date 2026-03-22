@@ -22,3 +22,40 @@
   font-family: inherit;
   /* Add more overrides if needed */
 }
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.audit-table td,
+.audit-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.audit-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.audit-header {
+  padding: 1rem 0 1rem 0;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.custom-datepicker-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}

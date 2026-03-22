@@ -5,3 +5,93 @@
   height: auto;
   border-radius: .3rem;
 }
+
+.categories-header {
+  padding: 1rem;
+  width: 97%;
+  margin: auto;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input,
+.add-categories {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.add-func {
+  width: 25%;
+}
+
+.save-categ {
+  padding: 0.5rem;
+  border: 0;
+  margin-left: .5rem;
+  width: 20%;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  background-color: #2bff00;
+}
+
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.category-table td,
+.category-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.category-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.btn-edit-categ,
+.btn-delete-categ,
+.btn-save,
+.btn-cancel {
+  padding: 0.3rem;
+  width: 15%;
+  margin-right: 0.3rem;
+}
+
+.btn-save {
+  background-color: #00ff08;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-cancel {
+  background-color: #6e6e6e;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-edit-categ {
+  background-color: #ffdd00;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-delete-categ {
+  background-color: #ff0000;
+  border: 0;
+  border-radius: .3rem;
+  color: #ffffff;
+  font-weight: 600;
+}

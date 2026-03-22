@@ -10,6 +10,7 @@ import Suppliers from "./suppliers/suppliers";
 import Inventory from "./inventory/inventory";
 import Users from "./users/users";
 import AuditLogs from "./auditlogs/auditlogs";
+import TransactionHistory from "./inventory/transactionhistory";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("access_token");
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="inventory" element={<Inventory />} />
           <Route path="users" element={<Users />} />
           <Route path="audit-logs" element={<AuditLogs />} />
+          <Route path="transactionhistory" element={<TransactionHistory />} />
         </Route>
       </Routes>
     </BrowserRouter>

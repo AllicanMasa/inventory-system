@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
-import '../categories/categories.css';
+import "../categories/categories.css";
 import ConfirmModal from "../modal/confirmmodal"; // import it
 
 const Categories = () => {
@@ -79,32 +79,42 @@ const Categories = () => {
   };
 
   const filtered = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="categories-page">
       {/* Add + Search */}
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <input
-          type="text"
-          placeholder="Search categories..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="New category"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-        />
-        <button onClick={handleAdd} disabled={loading}>
-          {loading ? "Adding..." : "Add"}
-        </button>
+      <div className="categories-header">
+        <div>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search categories..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="add-func">
+          <input
+            type="text"
+            placeholder="New category"
+            className="add-categories"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <button
+            className="save-categ"
+            onClick={handleAdd}
+            disabled={loading}
+          >
+            {loading ? "Adding..." : "Add"}
+          </button>
+        </div>
       </div>
 
       {/* Categories Table */}
-      <table border="1" cellPadding="8" style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table className="category-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -127,19 +137,23 @@ const Categories = () => {
               <td>
                 {editingId === c.id ? (
                   <>
-                    <button onClick={saveEdit}>
+                    <button className="btn-save" onClick={saveEdit}>
                       <MdSave />
                     </button>
-                    <button onClick={cancelEdit}>
+                    <button className="btn-cancel" onClick={cancelEdit}>
                       <MdCancel />
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => startEdit(c.id, c.name)}>
+                    <button
+                      className="btn-edit-categ"
+                      onClick={() => startEdit(c.id, c.name)}
+                    >
                       <MdEdit />
                     </button>
                     <button
+                      className="btn-delete-categ"
                       onClick={() => {
                         setCategoryToDelete(c);
                         setIsConfirmOpen(true);

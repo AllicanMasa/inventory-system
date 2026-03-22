@@ -3,7 +3,7 @@
   margin: 1rem;
   padding: 1rem;
   height: auto;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
 }
 
 .inventory-table {
@@ -20,4 +20,92 @@
 .low-stock {
   color: red;
   font-weight: bold;
+}
+
+.history-page {
+  background-color: rgb(255, 255, 255);
+  margin: 1rem;
+  padding: 1rem;
+  height: auto;
+  border-radius: 0.3rem;
+}
+
+.inventory-header {
+  padding: 1rem 0 1rem 0;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.view-history {
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #0048ff;
+  transition-duration: .5s;
+}
+
+.view-history:hover {
+  background-color: #001c62;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.inventory-table td,
+.inventory-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.inventory-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.btn-manage {
+  padding: 0.3rem;
+  width: 100%;
+  margin-right: 0.3rem;
+}
+
+.btn-manage {
+  background-color: #0800ff;
+  border: 0;
+  border-radius: 0.3rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-in {
+  background-color: #b8dec1;
+  color: #00751b;
+} /* Green */
+.badge-out {
+  background-color: #ffacb3;
+  color: #90000e;
+} /* Red */
+.badge-neutral {
+  background-color: #e2e3e5;
+  color: #383d41;
 }

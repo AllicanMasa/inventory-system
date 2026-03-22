@@ -251,29 +251,28 @@ const Users = () => {
 
   return (
     <div className="users-page">
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <input
-          placeholder="Search users..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="users-header">
+        <div>
+          <input
+            placeholder="Search users..."
+            className="search-input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <button className="refresh" onClick={fetchUsers}>
+            Refresh
+          </button>
+        </div>
+
+        <div>
+          <button className="add-users" onClick={() => setIsAddOpen(true)}>
+            Add User
+          </button>
+        </div>
       </div>
 
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <button onClick={() => setIsAddOpen(true)}>Add User</button>
-      </div>
-
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <input
-          placeholder="Search users..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <button onClick={fetchUsers}>Refresh</button>
-      </div>
-
-      <table border="1" cellPadding="8" style={{ width: "100%" }}>
+      <table className="users-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -299,11 +298,12 @@ const Users = () => {
               </td>
               <td>{u.status ? "Active" : "Inactive"}</td>
               <td>
-                <button onClick={() => openEditModal(u)}>
+                <button className="btn-edit" onClick={() => openEditModal(u)}>
                   <MdEdit />
                 </button>
 
                 <button
+                  className="btn-delete"
                   onClick={() => {
                     setSelectedUserId(u.id);
                     setIsDeleteOpen(true);

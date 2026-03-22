@@ -124,21 +124,25 @@ const Suppliers = () => {
 
   return (
     <div className="suppliers-page">
-
       {/* Top Bar */}
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <button onClick={openAddModal}>+ Add Supplier</button>
-
+      <div className="suppliers-header">
+        <div>
         <input
           type="text"
+          className="search-input"
           placeholder="Search suppliers..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        </div>
+
+        <div>
+          <button className="add-suppliers" onClick={openAddModal}>+ Add Supplier</button>
+        </div>
       </div>
 
       {/* Table */}
-      <table border="1" cellPadding="8" style={{ width: "100%" }}>
+      <table className="suppliers-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -160,11 +164,12 @@ const Suppliers = () => {
                 <td>{s.email}</td>
                 <td>{s.address}</td>
                 <td>
-                  <button onClick={() => openEditModal(s)}>
+                  <button className="btn-edit" onClick={() => openEditModal(s)}>
                     <MdEdit />
                   </button>
 
                   <button
+                  className="btn-delete"
                     onClick={() => {
                       setSupplierToDelete(s);
                       setIsConfirmOpen(true);

@@ -3,5 +3,88 @@
   margin: 1rem;
   padding: 1rem;
   height: auto;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table td,
+.users-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.users-header {
+  padding: 1rem 0 1rem 0;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.refresh {
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 0.3rem;
+  background-color: #000000;
+  transition-duration: 0.5s;
+}
+
+.refresh:hover {
+  background-color: #383838;
+}
+
+.add-users {
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  color: #000000;
+  background-color: #11ff00;
+  transition-duration: 0.5s;
+}
+
+.add-users:hover {
+  background-color: #2e8d27;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.3rem;
+  width: 30%;
+  margin-right: 0.3rem;
+}
+
+.btn-edit {
+  background-color: #2f00ff;
+  border: 0;
+  border-radius: 0.3rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-delete {
+  background-color: #ff0000;
+  border: 0;
+  border-radius: 0.3rem;
+  color: #ffffff;
+  font-weight: 600;
 }

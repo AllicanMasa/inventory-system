@@ -23,6 +23,8 @@ const Header = () => {
         return "Suppliers";
       case "inventory":
         return "Inventory";
+      case "transactionhistory":
+        return "Stock Transaction History";
       case "users":
         return "Users";
       case "audit-logs":

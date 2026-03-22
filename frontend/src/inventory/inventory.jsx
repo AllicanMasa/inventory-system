@@ -1,13 +1,15 @@
+// inventory.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../inventory/inventory.css";
 import Modal from "../modal/modal";
 
 const Inventory = () => {
-  const [items, setItems] = useState([]);
+  const [variants, setVariants] = useState([]); // now variant-level items
   const [suppliers, setSuppliers] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    product_id: "",
+    variant_id: "", // changed from product_id
     type: "",
     direction: "",
     supplier_id: "",
@@ -16,21 +18,24 @@ const Inventory = () => {
   });
 
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
 
-  // Fetch inventory
+  // Fetch all variants with product info
   const fetchInventory = async () => {
     try {
+      // CHANGE THIS URL from /variants to /inventory
       const res = await fetch("http://localhost:8000/inventory", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) throw new Error("Failed to fetch inventory");
       const data = await res.json();
-      setItems(data);
+      setVariants(data);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch variants error:", err);
     }
   };
 
-  // Fetch suppliers
+  // Fetch suppliers (unchanged)
   const fetchSuppliers = async () => {
     try {
       const res = await fetch("http://localhost:8000/suppliers", {
@@ -48,7 +53,6 @@ const Inventory = () => {
     fetchSuppliers();
   }, []);
 
-  // Type change
   const handleTypeChange = (e) => {
     const value = e.target.value;
     setForm((prev) => ({
@@ -59,18 +63,16 @@ const Inventory = () => {
     }));
   };
 
-  // Submit stock transaction
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.product_id || !form.quantity || !form.type) {
-      alert("Product, type, and quantity are required");
+    if (!form.variant_id || !form.quantity || !form.type) {
+      alert("Variant, type, and quantity are required");
       return;
     }
 
-    // Construct payload based on type
     const payload = {
-      product_id: parseInt(form.product_id),
+      variant_id: parseInt(form.variant_id), // ← now sending variant_id
       type: form.type.toUpperCase(),
       quantity: parseInt(form.quantity, 10),
       notes: form.notes || null,
@@ -107,14 +109,14 @@ const Inventory = () => {
       alert("Stock transaction saved!");
       setOpen(false);
       setForm({
-        product_id: "",
+        variant_id: "",
         type: "",
         direction: "",
         supplier_id: "",
         quantity: "",
         notes: "",
       });
-      fetchInventory();
+      fetchInventory(); // refresh
     } catch (err) {
       console.error(err);
       alert("Failed to save transaction");
@@ -123,48 +125,81 @@ const Inventory = () => {
 
   return (
     <div className="inventory-page">
+      <div className="inventory-header">
+        <button
+          className="view-history"
+          onClick={() => navigate("/home/transactionhistory")}
+        >
+          View Transaction History
+        </button>
+      </div>
+
       <table className="inventory-table">
         <thead>
           <tr>
             <th>Product</th>
+            <th>Variant</th>
             <th>SKU</th>
+            <th>Size</th>
+            <th>Color</th>
             <th>Quantity</th>
-            <th>Min Stock</th>
+            <th>Min Stock*</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.product_id}>
-              <td>{item.name}</td>
-              <td>{item.sku}</td>
-              <td className={item.quantity <= item.min_stock ? "low-stock" : ""}>
-                {item.quantity}
-              </td>
-              <td>{item.min_stock}</td>
-              <td>
-                <button
-                  onClick={() => {
-                    setForm({
-                      product_id: item.product_id,
-                      type: "",
-                      direction: "",
-                      supplier_id: "",
-                      quantity: "",
-                      notes: "",
-                    });
-                    setOpen(true);
-                  }}
-                >
-                  Manage
-                </button>
+          {variants.length === 0 ? (
+            <tr>
+              <td colSpan={8} style={{ textAlign: "center", padding: "2rem" }}>
+                No variants found
               </td>
             </tr>
-          ))}
+          ) : (
+            variants.map((v) => (
+              <tr
+                key={v.id}
+                className={v.quantity <= (v.min_stock || 0) ? "low-stock" : ""}
+              >
+                <td>{v.product_name}</td>
+                <td>
+                  {v.size || "—"} / {v.color || "—"}
+                </td>
+                <td>{v.sku}</td>
+                <td>{v.size || "—"}</td>
+                <td>{v.color || "—"}</td>
+                <td
+                  className={
+                    v.quantity <= (v.min_stock || 0) ? "low-stock" : ""
+                  }
+                >
+                  {v.quantity}
+                </td>
+                <td>{v.min_stock ?? "—"}</td>
+                <td>
+                  <button
+                    className="btn-manage"
+                    onClick={() => {
+                      setForm({
+                        variant_id: v.id,
+                        type: "",
+                        direction: "",
+                        supplier_id: "",
+                        quantity: "",
+                        notes: "",
+                      });
+                      setOpen(true);
+                    }}
+                  >
+                    Manage
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
-      {/* Modal */}
+      {/* Modal - now works with variant_id */}
       <Modal isOpen={open} onClose={() => setOpen(false)}>
         <h3>Stock Transaction</h3>
         <form onSubmit={handleSubmit}>
@@ -175,11 +210,12 @@ const Inventory = () => {
             <option value="RETURN">Return</option>
           </select>
 
-          {/* Supplier only for IN */}
           {form.type === "IN" && (
             <select
               value={form.supplier_id}
-              onChange={(e) => setForm({ ...form, supplier_id: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, supplier_id: e.target.value })
+              }
               required
             >
               <option value="">Select Supplier</option>
@@ -191,7 +227,6 @@ const Inventory = () => {
             </select>
           )}
 
-          {/* Direction only for RETURN */}
           {form.type === "RETURN" && (
             <select
               value={form.direction}
@@ -210,6 +245,7 @@ const Inventory = () => {
             value={form.quantity}
             onChange={(e) => setForm({ ...form, quantity: e.target.value })}
             required
+            min="1"
           />
 
           <textarea

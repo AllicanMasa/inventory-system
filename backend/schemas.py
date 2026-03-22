@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, Field
 from typing import Optional, Literal
 
 
@@ -9,9 +9,11 @@ class ProductCreate(BaseModel):
     category_id: int
     price: float
     min_stock: int
+    variants: Optional[list[VariantBase]] = Field(default_factory=list)
 
 class ProductResponse(ProductCreate):
     id: int
+    variants: list[VariantBase] = Field(default_factory=list) # type: ignore
 
     model_config = {
         "from_attributes": True
@@ -132,3 +134,16 @@ class StockRequest(BaseModel):
     quantity: int
     direction: Optional[str] = None
     notes: Optional[str] = None
+
+class VariantBase(BaseModel):
+    size: str
+    color: str
+    sku: str
+    quantity: int = 0
+
+class VariantResponse(VariantBase):
+    id: int
+    
+    model_config = {
+        "from_attributes": True
+    }

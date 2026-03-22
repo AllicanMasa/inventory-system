@@ -5,3 +5,75 @@
   height: auto;
   border-radius: .3rem;
 }
+
+.suppliers-header {
+  padding: 1rem;
+  justify-content: space-between;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  border-radius: 0.3rem;
+}
+
+.add-suppliers {
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  background-color: #2bff00;
+}
+
+.suppliers-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.suppliers-table td,
+.suppliers-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.suppliers-table th {
+  background-color: #000000;
+  color: #ffffff;
+  position: sticky;
+}
+
+.btn-edit,
+.btn-add-sub,
+.btn-delete {
+  padding: 0.3rem;
+  width: 25%;
+  margin-right: 0.3rem;
+}
+
+.btn-edit {
+  background-color: #ffdd00;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-add-sub {
+  background-color: #48ff00;
+  border: 0;
+  border-radius: .3rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-delete {
+  background-color: #ff0000;
+  border: 0;
+  border-radius: .3rem;
+  color: #ffffff;
+  font-weight: 600;
+}

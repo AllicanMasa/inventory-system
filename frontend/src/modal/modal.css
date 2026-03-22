@@ -13,9 +13,11 @@
 
 .modalContent {
   background-color: white;
+  align-items: center;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  padding: 24px;
+  padding: 1rem;
+  margin: auto;
   width: 30%;
   position: relative;
   display: flex;
@@ -24,19 +26,20 @@
 }
 
 .modalContent input {
-  width: 80%;
+  width: 89%;
   padding: 0.5rem;
+  align-items: center;
+  margin-bottom: .5rem;
+  justify-content: center;
   border: 1px solid #000000;
   border-radius: 0.3rem;
-  margin: auto;
 }
 
 .modalContent select {
-  width: 84%;
+  width: 94%;
   padding: 0.5rem;
   border: 1px solid #000000;
   border-radius: 0.3rem;
-  margin: auto;
 }
 
 .modalContent button {
@@ -54,6 +57,7 @@
 .confirm-modalOverlay {
   position: fixed;
   inset: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,7 +74,6 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   padding: 24px;
   width: 20%;
-  height: 12rem;
   position: relative;
 }
 
@@ -80,7 +83,7 @@
   font-weight: 600;
   border: 0;
   padding: 0.8rem;
-  width: 25%;
+  width: 35%;
   margin: auto;
   cursor: pointer;
   transition: background-color 0.3s ease; /* smooth effect */
@@ -88,4 +91,8 @@
 
 .confirm-modalContent button:hover {
   background-color: burlywood;
+}
+
+.message {
+  font-size: .9rem;
 }
