@@ -13,7 +13,7 @@ def get_dashboard_stats(db: Session = Depends(get_db), current_user = Depends(ge
     today = datetime.now().date()
     
     # 1. Get the total number of product variants in the system
-    total_prods = db.query(models.ProductVariant).count()
+    total_prods = db.query(models.ProductVariant).filter(models.ProductVariant.is_active == True).count()
 
     # 2. Fetch all transactions to calculate totals
     all_transactions = db.query(models.StockTransaction).all()
@@ -101,17 +101,17 @@ def get_inventory_levels(db: Session = Depends(get_db), current_user = Depends(g
             models.ProductVariant.color,
             models.ProductVariant.quantity,
             models.Product.min_stock
-        )
+        ) # <--- Fill these in to fix the "No overloads" error
         .join(models.Product, models.ProductVariant.product_id == models.Product.id)
-        # Optional: Sort by lowest stock first so the "problems" are on the left
+        .filter(models.ProductVariant.is_active == True)
+        .filter(models.Product.is_active == True)
         .order_by(models.ProductVariant.quantity.asc()) 
-        .limit(15) # Keeps the chart from getting too crowded
+        .limit(15)
         .all()
     )
 
     return [
         {
-            # Label example: "Blue Shirt (M - Red)"
             "label": f"{r.name} ({r.size}{f' - {r.color}' if r.color else ''})",
             "stock": r.quantity or 0,
             "min_stock": r.min_stock or 0

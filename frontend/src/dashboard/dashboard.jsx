@@ -106,11 +106,9 @@ const Dashboard = () => {
                 {recentTransactions.map((t) => (
                   <tr key={t.id}>
                     <td>{t.date}</td>
-                    <td>
-                      <span
-                        className={`badge-${t.direction?.toLowerCase() || "unknown"}`}
-                      >
-                        {t.type}
+                    <td className="transaction-type">
+                      <span className={`badge-${t.type.toLowerCase()}`}>
+                        {t.type} {t.direction ? `(${t.direction})` : ""}
                       </span>
                     </td>
                     <td>

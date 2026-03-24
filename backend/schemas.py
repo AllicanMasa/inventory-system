@@ -128,9 +128,8 @@ class AuditLogOut(BaseModel):
     }
 
 class StockRequest(BaseModel):
-    product_id: int
-    # This enforces that only the values allowed by your DB can be used
-    type: Literal["stock_in", "stock_out"] 
+    variant_id: int
+    type: Literal["stock_in", "stock_out", "return", "IN", "OUT", "RETURN"] # Match your frontend!
     quantity: int
     direction: Optional[str] = None
     notes: Optional[str] = None

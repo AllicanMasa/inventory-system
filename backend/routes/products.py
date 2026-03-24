@@ -143,28 +143,29 @@ def update_product(
 
 # ------------------ DELETE PRODUCT ------------------
 
-@router.delete("/{product_id}")
+@router.delete("/{id}")
 def delete_product(
-    product_id: int, 
-    db: Session = Depends(get_db),
+    id: int, 
+    db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user),
-    _: bool = Depends(require_permission("products:manage")),
+    _: bool = Depends(require_permission("products:manage"))
 ):
-    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    product = db.query(models.Product).filter(models.Product.id == id).first()
     
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    db.delete(product)
+    # Soft delete the product
+    product.is_active = False
+    
+    # Optional: Also soft-delete all associated variants so they don't hang around
+    for variant in product.variants:
+        variant.is_active = False
+        
     db.commit()
     
-    log_action(
-        db,
-        current_user.id,
-        f"Deleted product {product.name} (id={product_id})"
-    )
-    
-    return {"message": "Product deleted successfully"}
+    log_action(db, current_user.id, f"Deactivated product {product.name} (id={id})")
+    return {"message": "Product and variants deactivated"}
 
 
 # ------------------ ADD VARIANT ------------------

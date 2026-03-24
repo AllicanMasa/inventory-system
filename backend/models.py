@@ -111,3 +111,4 @@ class ProductVariant(Base):
     color = Column(String(50))
     sku = Column(String(100))
     quantity = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True) # <--- Add this

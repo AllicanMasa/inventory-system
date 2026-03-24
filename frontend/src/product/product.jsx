@@ -231,22 +231,30 @@ const Product = () => {
   };
 
   // ---------------- TABLE VIEW (UPDATED WITH SORT) ----------------
-  const tableRows = [...products] // Copy array to avoid mutating state directly
-    // NEW: Sort by ID (Highest ID = Newest Product)
+  // product.jsx inside the Product component
+  const tableRows = [...products]
+    // 1. Filter out inactive products first
+    .filter((product) => product.is_active !== false)
     .sort((a, b) => {
-      if (sortOrder === "newest") return b.id - a.id; // New to Old
-      return a.id - b.id; // Old to New
+      if (sortOrder === "newest") return b.id - a.id;
+      return a.id - b.id;
     })
-    .flatMap((product) =>
-      (product.variants?.length > 0
-        ? product.variants
-        : [{ id: null, size: "N/A", color: "N/A" }]
+    .flatMap((product) => {
+      // 2. Filter out inactive variants within the product
+      const activeVariants = (product.variants || []).filter(
+        (v) => v.is_active !== false,
+      );
+
+      return (
+        activeVariants.length > 0
+          ? activeVariants
+          : [{ id: null, size: "N/A", color: "N/A" }]
       ).map((variant) => ({
         ...product,
         currentVariant: variant,
         isNoVariant: variant.id === null,
-      })),
-    )
+      }));
+    })
     .filter(
       (row) =>
         row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -314,6 +322,7 @@ const Product = () => {
                 </td>
                 <td>{row.min_stock}</td>
                 <td className="actions-cell">
+                  {/* Edit button: Only show if there IS a variant to edit */}
                   {!row.isNoVariant && (
                     <button
                       className="btn-edit"
@@ -346,13 +355,28 @@ const Product = () => {
                     + Variant
                   </button>
 
-                  {!row.isNoVariant && (
+                  {/* Delete Logic Toggle */}
+                  {row.isNoVariant ? (
+                    /* SHOW THIS IF PRODUCT IS EMPTY */
+                    <button
+                      className="btn-delete-text"
+                      style={{ width: "40%" }}
+                      onClick={() => {
+                        setProductToDelete(row.id);
+                        setDeleteProductToo(true); // Tells the handler to use the Product DELETE URL
+                        setIsDeleteVariantOpen(true);
+                      }}
+                    >
+                      Delete Product
+                    </button>
+                  ) : (
+                    /* SHOW THIS IF DELETING A SPECIFIC VARIANT */
                     <button
                       className="btn-delete-text"
                       onClick={() => {
                         setVariantToDelete(row.currentVariant.id);
                         setProductToDelete(row.id);
-                        setDeleteProductToo(false);
+                        setDeleteProductToo(false); // Tells the handler to use the Variant DELETE URL
                         setIsDeleteVariantOpen(true);
                       }}
                     >

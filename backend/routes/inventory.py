@@ -23,6 +23,7 @@ def get_inventory(db: Session = Depends(get_db)):
         )
         .join(models.Product, models.ProductVariant.product_id == models.Product.id)
         .outerjoin(models.Category, models.Product.category_id == models.Category.id)
+        .filter(models.ProductVariant.is_active == True)
         .all()
     )
 

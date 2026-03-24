@@ -21,11 +21,13 @@ def get_variants(db: Session = Depends(get_db)):
             models.ProductVariant.quantity,
             models.Product.name.label("product_name"),
             models.Product.price,
-            models.Product.min_stock, # <--- ADD THIS LINE
+            models.Product.min_stock,
             models.Category.name.label("category"),
         )
         .join(models.Product, models.ProductVariant.product_id == models.Product.id)
         .join(models.Category, models.Product.category_id == models.Category.id)
+        # --- ADD THIS LINE ---
+        .filter(models.ProductVariant.is_active == True) 
         .all()
     )
 
@@ -79,27 +81,17 @@ def update_variant(
 
 
 # ------------------ DELETE VARIANT ------------------
-@router.delete("/{id}")
-def delete_variant(
-    id: int,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
-    _: bool = Depends(require_permission("products:manage")),
-):
-    """
-    Delete a single variant.
-    """
-    variant = db.query(models.ProductVariant).filter_by(id=id).first()
+@router.delete("/{variant_id}") 
+def delete_variant(variant_id: int, db: Session = Depends(get_db)):
+    variant = db.query(models.ProductVariant).filter(models.ProductVariant.id == variant_id).first()
+    
     if not variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
-    db.delete(variant)
+    variant.is_active = False 
     db.commit()
-
-    log_action(
-        db,
-        current_user.id,
-        f"Deleted variant {variant.sku} (id={id})",
-    )
-
-    return {"message": "Variant deleted"}
+    
+    # Optional: Log the deletion
+    # log_action(db, current_user.id, f"Deactivated variant {variant.sku}")
+    
+    return {"message": "Variant deactivated"}
