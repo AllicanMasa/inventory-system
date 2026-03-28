@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -64,8 +64,13 @@ def get_current_user_permissions(
         .first()
     )
 
-    if not result:
-        raise HTTPException(status_code=401, detail="User not found")
+    try:
+        payload = auth.decode_access_token(token)
+    except ValueError as e:
+        raise HTTPException(
+        status_code=401,
+        detail=str(e)
+    )
 
     user, role_name = result
     # Normalize role name (e.g., "Super User" -> "super_user")
@@ -96,9 +101,6 @@ def get_current_user(
     db: Session = Depends(get_db),
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    """
-    Returns the current user object and updates their 'last_seen' timestamp.
-    """
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
@@ -118,12 +120,9 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="User not found")
 
     # ── UPDATE ONLINE STATUS ──
-    # This updates the DB every time the user makes an authenticated request
-    try:
-        user.last_seen = datetime.utcnow()
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        print(f"Error updating last_seen: {e}")
+    user.last_seen = datetime.now(timezone.utc)
+    db.add(user)
+    db.commit()  # <-- this is required to save last_seen
+    db.refresh(user)
 
     return user

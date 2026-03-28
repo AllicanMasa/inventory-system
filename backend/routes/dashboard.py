@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from backend.database import get_db
 from backend import models
 from backend.dependencies import get_current_user
@@ -82,15 +82,17 @@ def get_sales_chart(view: str = "day", db: Session = Depends(get_db), current_us
     return {"labels": ["N/A"], "data": [0]}
 
 @router.get("/online-users")
-def get_online_users(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    # Anyone seen in the last 5 minutes is considered "Online"
-    five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
-    
+def get_online_users(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    five_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=5)
+
     online_users = db.query(models.User).filter(
         models.User.last_seen >= five_minutes_ago
     ).all()
-    
-    return [{"name": u.name, "id": u.id} for u in online_users]
+
+    return [{"id": u.id, "name": u.name} for u in online_users]
 
 @router.get("/inventory-levels")
 def get_inventory_levels(db: Session = Depends(get_db), current_user = Depends(get_current_user)):

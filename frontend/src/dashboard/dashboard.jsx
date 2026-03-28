@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../dashboard/dashboard.css";
 import Inventory from "../dashboard/inventorychart";
+import { authFetch } from "../authfetch/authfetch";
 
 const Dashboard = () => {
   // 1. Define states for your dynamic data
@@ -13,57 +14,57 @@ const Dashboard = () => {
   });
   const [recentTransactions, setRecentTransactions] = useState([]);
 
-  // 2. Grab the token from localStorage (This fixes your error!)
-  const token = localStorage.getItem("access_token");
-
   const fetchData = async () => {
     try {
-      // Fetch Online Users
-      const userRes = await fetch(
+      // 🔹 Fetch Online Users
+      const userRes = await authFetch(
         "http://localhost:8000/dashboard/online-users",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
-      const userData = await userRes.json();
-      setOnlineUsers(userData);
+      if (userRes) {
+        const userData = await userRes.json();
+        console.log("ONLINE USERS:", userData); // 👈 ADD THIS
+        setOnlineUsers(userData);
+      }
 
-      // Fetch Inventory Stats
-      const statsRes = await fetch("http://localhost:8000/dashboard/stats", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const statsData = await statsRes.json();
+      // 🔹 Fetch Inventory Stats
+      const statsRes = await authFetch("http://localhost:8000/dashboard/stats");
+      if (statsRes) {
+        const statsData = await statsRes.json();
 
-      console.log("Stats Data from API:", statsData); // ADD THIS LINE TO DEBUG
+        console.log("Stats Data from API:", statsData);
 
-      setStats({
-        totalProducts: statsData.totalProducts || 0,
-        totalStockIn: statsData.purchases || 0,
-        totalStockOut: statsData.stockOutCount || 0,
-        totalReturns: statsData.returns || 0, // Make sure 'returns' exists in the JSON
-      });
+        setStats({
+          totalProducts: statsData.totalProducts || 0,
+          totalStockIn: statsData.purchases || 0,
+          totalStockOut: statsData.stockOutCount || 0,
+          totalReturns: statsData.returns || 0,
+        });
+      }
 
-      // Fetch Recent Transactions (using your existing history endpoint)
-      const historyRes = await fetch(
+      // 🔹 Fetch Recent Transactions
+      const historyRes = await authFetch(
         "http://localhost:8000/inventory/history",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
-      const historyData = await historyRes.json();
-      setRecentTransactions(historyData.slice(0, 5)); // Just the 5 most recent
+      if (historyRes) {
+        const historyData = await historyRes.json();
+        setRecentTransactions(historyData.slice(0, 5));
+      }
     } catch (err) {
       console.error("Dashboard Fetch Error:", err);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-      const interval = setInterval(fetchData, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [token]);
+    const token = localStorage.getItem("access_token");
+
+    if (!token) return;
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="dashboard">
@@ -111,10 +112,7 @@ const Dashboard = () => {
                         {t.type} {t.direction ? `(${t.direction})` : ""}
                       </span>
                     </td>
-                    <td>
-                      {t.product_name} <br />
-                      <small>{t.sku}</small>
-                    </td>
+                    <td>{t.product_name}</td>
                     <td>{t.user}</td>
                   </tr>
                 ))}
